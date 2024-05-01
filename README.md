@@ -2,7 +2,9 @@
 
 Final Project for CSU DSCI 478 Capstone Class.
 
-Provided Data analysis for data scraped from nomadlist.com and tried to predict a total score ranking for each of the most popular digital nomad cities using a vast amount of regression techniques and machine learning methods. 
+Overview:
+
+Provided Data analysis for data scraped from nomadlist.com and tried to obtain most important variables for predicting a total score ranking for each of the most popular digital nomad cities using a vast amount of regression techniques and machine learning methods. 
 
 Introduction:
 
