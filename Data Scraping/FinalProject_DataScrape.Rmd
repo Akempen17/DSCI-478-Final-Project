@@ -1,0 +1,293 @@
+```{r}
+#models loaded for scraping
+
+library(rvest)
+library(kableExtra)
+library(readr) 
+library(kableExtra) 
+library(ggplot2)
+library(tidymodels) 
+library(dplyr)
+library(zoo)
+library(janitor)
+library(GGally)
+library(ggpubr)
+library(gridExtra)
+library(forecast)
+library(DescTools)
+library(data.table)
+library(textclean)
+library(stringr)
+library(maps)
+```
+
+```{r}
+#List of Cities used
+cities <- c("bangkok", "tokyo", "buenos-aires", "mexico-city", "chiang-mai", "kuala-lumpur",
+            "seoul", "athens", "ko-pha-ngan", "zagreb", "penang", "krakow", "cape-town",
+            "hong-kong", "valencia", "portimao", "budapest", "alicante", "helsinki", "rijeka",
+            "costa-da-caparica", "fuerteventura", "warsaw", "siargao", "skopje", "prague",
+            "lagos-algarve", "copenhagen", "wroclaw", "ubud", "kyoto", "porto", "yerevan",
+            "atlanta", "denver", "munich", "hoi-an", "johor-bahru", "berlin", "san-antonio",
+            "dubai", "wellington", "canggu", "split", "rio-de-janeiro", "austin", "gran-canaria",
+            "oaxaca", "senggigi", "queretaro", "barcelona", "lisbon", "hyderabad", "newcastle-upon-tyne",
+            "istanbul", "chicago", "montpellier", "groningen", "monterrey", "leiden", "da-nang",
+            "ericeira", "montevideo", "new-york-city", "cebu", "phuket", "madrid", "sofia",
+            "hanoi", "dahab", "seville", "bogota", "medellin", "ko-samui", "bath", "marrakesh",
+            "stockholm", "paphos", "cluj", "quebec-city", "ho-chi-minh-city", "reykjavik",
+            "panama-city", "bratislava", "tainan", "kathmandu", "malaga", "tenerife", "delhi",
+            "singapore", "bucharest", "bologna", "brasilia", "sao-paulo", "brno", "vilnius",
+            "almaty", "vancouver", "galle", "florianopolis", "amsterdam", "uluwatu", "london",
+            "tbilisi", "tirana", "playa-del-carmen", "madeira", "azores", "granada", "paris",
+            "taipei", "phnom-penh", "lima", "siem-reap", "melbourne", "manchester", "chamonix",
+            "batumi", "kaunas", "sydney", "peniche", "timisoara", "coimbra", "lille", "jakarta",
+            "chania", "puerto-escondido", "makati", "vienna", "gdansk", "bariloche", "pokhara",
+            "jodhpur", "antalya", "brussels", "busan", "constanta",
+            "shanghai", "nairobi", "tallinn", "naha", "hue", "auckland", "aveiro", "galapagos-islands",
+            "okinawa-city", "montreal", "dusseldorf", "szczecin", "palawan", "abu-dhabi",
+            "toronto", "ploiesti", "nantes", "mallorca", "osijek", "jimbaran", "brasov",
+            "haikou", "johannesburg", "davao", "bengaluru", "osaka", "ljubljana", "indianapolis",
+            "cordoba", "belgrade", "port-louis", "ottawa", "seminyak", "adana", "daegu",
+            "iasi", "brisbane", "leicester", "gothenburg", "braga", "faro", "surat", "asuncion",
+            "thane", "las-vegas", "craiova", "daejeon", "alexandria", "nis", "amritsar", "lodz",
+            "santo-domingo", "fort-lauderdale", "frankfurt", "palermo", "liverpool", "taghazout",
+            "plovdiv", "dubrovnik", "lublin", "bandung", "izmir", "kota-kinabalu", "columbus",
+            "varna", "la-plata", "kaohsiung", "zadar", "pretoria", "salt-lake-city", "mcallen",
+            "nha-trang", "ko-lanta", "mendoza", "aachen", "jaipur", "pune", "agra", "thimphu",
+            "san-francisco", "antigua", "porto-alegre", "larnaca", "katowice", "noida",
+            "rosario", "dallas", "cozumel", "portland", "dresden", "suva", "belem", "ogden",
+            "goa", "los-angeles", "gwangju", "suwon", "tulsa", "fortaleza", "the-hague",
+            "paramaribo", "arugam-bay", "kuching", "elkhart", "nuremberg", "burgas", "corfu",
+            "rome", "gurgaon", "surabaya", "amman", "nottingham", "hamburg", "sanur",
+            "brownsville", "edmonton", "durban", "novi-sad", "mumbai", "recife", "yuma", 
+            "manama", "natal", "la-union", "matara", "utrecht", "curitiba", "lagos",
+            "makassar", "salta", "christchurch", "podgorica", "menorca", "general-santos",
+            "vadodara", "goiania", "perth", "lake-balaton", "krabi", "kosice", "thessaloniki",
+            "surrey", "birmingham", "eindhoven", "ankara", "cusco", "hull", "livingstone",
+            "lethbridge", "hoover", "normal", "agadir", "kandy", "kansas-city", "conroe",
+            "stuttgart", "columbus-ga", "nagpur", "mission", "mysore", "des-moines", "amarillo",
+            "grande-prairie", "langkawi", "abbotsford", "tangier", "kuta", "tunis", "chandigarh",
+            "grenoble", "cuenca", "itajai", "patras", "cairo", "antwerp", "amed", "gainesville",
+            "xi-an", "regina", "changzhou", "mcleod-ganj", "nicosia", "hobart", "cavtat",
+            "winnipeg", "malmo", "modena", "aurora", "baltimore", "khulna", "madurai", "giza",
+            "rotterdam", "kalyan", "phu-quoc", "turku", "pittsburgh", "nashville", "alanya",
+            "calgary", "cleveland", "nakhon-ratchasima", "tyler", "lucknow", "saskatoon",
+            "nashik", "malang", "kollam", "pharr", "honolulu", "sliema", "enid", "syracuse",
+            "pristina", "knoxville", "havana", "meerut", "cincinnati", "pisa", "luanda",
+            "campinas", "fes", "canton", "north-little-rock", "casper", "bristol", "malacca",
+            "merida", "terre-haute", "guatemala-city", "ipoh", "bowling-green", "cancun",
+            "zurich", "tampa", "santa-cruz", "banja-luka", "hubli", "idaho-falls", "brampton",
+            "edinburg", "graz", "salvador", "rogers", "kannur", "springdale", "shreveport",
+            "padova", "buffalo", "denpasar", "durg", "fukuoka", "el-gouna", "chittagong",
+            "harare", "houston", "sumperk", "scranton", "elgin", "bursa", "sharjah",
+            "guadalajara", "da-lat", "guangzhou", "sioux-city", "limassol", "poznan",
+            "kobe", "gaziantep", "quito", "jamshedpur", "sioux-falls", "laredo",
+            "visakhapatnam", "dothan", "springfield", "bareilly", "mar-del-plata", "jena",
+            "patna", "harlingen", "tilburg", "miami", "port-arthur", "gori", "muncie",
+            "huainan", "varanasi", "norwich", "dongguan", "dhanbad", "jeju-island",
+            "killeen", "warner-robins", "ludhiana", "waterloo-ia", "fargo", "bethlehem",
+            "raipur", "muscat", "cedar-rapids", "chattanooga", "kozhikode", "kagoshima",
+            "port-elizabeth", "sheffield", "bossier-city", "oxford", "gwalior", "fort-smith",
+            "cirebon", "luxor", "luang-prabang", "grand-island", "memphis", "battle-creek",
+            "jabalpur", "albufeira", "conway", "bedford", "aurangabad", "rabat",
+            "pekanbaru", "bar", "jonesboro", "pamplona", "burlington", "eau-claire",
+            "fuzhou", "almere", "medan", "leeds", "lansing", "thiruvananthapuram",
+            "champaign", "sarajevo", "reading-pa", "cody", "sacramento", "tucson",
+            "kochi", "coventry", "mostar", "rzeszow", "las-cruces", "enterprise",
+            "surakarta", "albuquerque", "macon", "bryan", "college-station", "baku",
+            "palembang", "flint", "seattle", "valdosta", "oregon-city", "astana",
+            "lawrence", "baguio", "victoria-tx", "rockford")
+
+subset <- c("Bangkok","Tokyo")
+subset
+```
+
+
+```{r}
+#Scraping stats from nomadlist.com
+draftStats <- tibble()
+x = 0
+for (i in cities) {
+  x = x+1
+  if(x %% 9 == 0) {Sys.sleep(3)}
+  
+#URL and Scraping Data for Nomadlist.com
+  url <- paste0("https://nomadlist.com/",i)
+  NBADraft <- read_html(url)
+    
+  
+  #Cleaning Data
+  CleanData <- NBADraft %>%
+    html_elements("table.details") %>%
+    .[1] %>%
+    html_table() %>%
+    data.frame() #%>%
+    #janitor::clean_names(case = "none")
+
+  CleanData <- transpose(CleanData) %>%
+    janitor::row_to_names(row_number = 1)
+
+  #Updating Final Data Frame
+  CleanData <- CleanData %>%
+    mutate(HCity = i)
+  
+  draftStats <- bind_rows(draftStats, CleanData)
+  
+}
+  
+```
+
+```{r}
+#Lookng at dataframe
+draftStats
+```
+
+```{r}
+#Cleaning variable names
+names(draftStats)= str_sub(names(draftStats),2)
+
+names(draftStats)[1] <- "Total_Score"
+names(draftStats)[2] <- "Liked_By_Members"
+names(draftStats)[3] <- "Quality_Of_Life_Score"
+names(draftStats)[4] <- "Family_Score"
+names(draftStats)[5] <- "Community_Score"
+names(draftStats)[6] <- "Cost"
+names(draftStats)[7] <- "Internet"
+names(draftStats)[8] <- "Fun"
+names(draftStats)[9] <- "Temperature"
+names(draftStats)[10] <- "Humidity_now"
+names(draftStats)[11] <- "Air_Quality_Now"
+names(draftStats)[12] <- "Air_Quality_Annual"
+names(draftStats)[13] <- "Safety"
+names(draftStats)[14] <- "Food_Safety"
+names(draftStats)[15] <- "Lack_Of_Crime"
+names(draftStats)[16] <- "Lack_Of_Racism"
+names(draftStats)[17] <- "Education_Level"
+names(draftStats)[18] <- "Power_Grid"
+names(draftStats)[19] <- "Vulnerability_To_Climate_Change"
+names(draftStats)[20] <- "Income_Level"
+names(draftStats)[21] <- "English_Speaking"
+names(draftStats)[22] <- "People_Density"
+names(draftStats)[23] <- "Walkability"
+names(draftStats)[24] <- "Peace"
+names(draftStats)[25] <- "Traffic_Safety"
+names(draftStats)[26] <- "Hospitals"
+names(draftStats)[27] <- "Happiness"
+names(draftStats)[28] <- "Nightlife"
+names(draftStats)[29] <- "Free_Wifi_In_City"
+names(draftStats)[30] <- "Places_To_Work_From"
+names(draftStats)[31] <- "AC_Or_Heating"
+names(draftStats)[32] <- "Friendly_To_Foreigners"
+names(draftStats)[33] <- "Freedom_Of_Speech"
+names(draftStats)[34] <- "Female_Friendly"
+names(draftStats)[35] <- "LGBTQ_Friendly"
+names(draftStats)[36] <- "Startup_Score"
+names(draftStats)[38] <- "Liked_By_Locals"
+
+
+#Cleaning Data Set / Getting important information from dataset
+
+#Total Score: Out Of Five
+draftStats$Total_Score <- read.table(text = draftStats$Total_Score, sep = "/", as.is = TRUE)$V1
+#draftStats$Total_Score <- as.double(draftStats$Total_Score)
+
+#Liked By Members: Percentage
+for(x in 1:nrow(draftStats)){
+  if(is.na(draftStats$Liked_By_Members[x]) == FALSE){
+    draftStats$Liked_By_Members[x] <-
+      substring(draftStats$Liked_By_Members[x],2)
+    draftStats$Liked_By_Members[x] <- 
+      read.table(text = draftStats$Liked_By_Members[x],
+                 sep = "%", as.is = TRUE)$V1
+  }
+}
+draftStats$Liked_By_Members <- as.integer(draftStats$Liked_By_Members)
+
+#Cost: Per Month
+draftStats$Cost <- str_sub(draftStats$Cost,2)
+draftStats$Cost <- read.table(text = draftStats$Cost, sep = "$", as.is = TRUE)$V2
+draftStats$Cost <- read.table(text = draftStats$Cost, sep = "/", as.is = TRUE)$V1
+
+#Internet: Mbps Avg
+draftStats$Internet <- read.table(text = draftStats$Internet, sep = ":", as.is = TRUE)$V2
+draftStats$Internet <- read.table(text = draftStats$Internet, sep = "M", as.is = TRUE)$V1
+
+#Humidity now: percent
+draftStats$Humidity_now <- read.table(text = draftStats$Humidity_now, sep = ":", as.is = TRUE)$V2
+draftStats$Humidity_now <- read.table(text = draftStats$Humidity_now, sep = "%", as.is = TRUE)$V1
+
+#Air Quality Now: US AQI
+for(x in 1:nrow(draftStats)){
+  if(is.na(draftStats$Air_Quality_Now[x]) == FALSE){
+    draftStats$Air_Quality_Now[x] <- 
+      read.table(text = draftStats$Air_Quality_Now[x], sep = ":", as.is = TRUE)$V2
+    draftStats$Air_Quality_Now[x] <- 
+      read.table(text = draftStats$Air_Quality_Now[x], sep = "U", as.is = TRUE)$V1
+  }
+}
+
+#Air Quality Annual: US AQI
+for(x in 1:nrow(draftStats)){
+  if(is.na(draftStats$Air_Quality_Annual[x]) == FALSE){
+    draftStats$Air_Quality_Annual[x] <- 
+      read.table(text =draftStats$Air_Quality_Annual[x], sep = ":", as.is = TRUE)$V2
+    draftStats$Air_Quality_Annual[x] <- 
+      read.table(text = draftStats$Air_Quality_Annual[x], sep = "U", as.is = TRUE)$V1
+  }
+}
+
+#Income Level: Per Month
+draftStats$Income_Level <- read.table(text = draftStats$Income_Level, sep = "$", as.is = TRUE)$V2
+draftStats$Income_Level <- read.table(text = draftStats$Income_Level, sep = "/", as.is = TRUE)$V1
+
+#People Density: thousand ppl/km2
+for(x in 1:nrow(draftStats)){
+  if(is.na(draftStats$People_Density[x]) == FALSE){
+    draftStats$People_Density[x] <- 
+      read.table(text = draftStats$People_Density[x], sep = ":", as.is = TRUE)$V2
+    draftStats$People_Density[x] <- 
+      read.table(text = draftStats$People_Density[x], sep = "k", as.is = TRUE)$V1
+  }
+}
+
+#Total Rank
+draftStats <- draftStats %>%
+  mutate(Rank = order(-Total_Score))
+
+#Unliked By Members: Percentage
+draftStats[ , 'Unliked_By_Members'] = NA
+for(x in 1:nrow(draftStats)){
+  if(is.na(draftStats$Liked_By_Members[x]) == FALSE){
+    #Unliked By Members:Percentage
+    draftStats$Unliked_By_Members[x] <- (100 - draftStats$Liked_By_Members[x])
+  }
+}
+  
+
+#Temperature In Celcius
+draftStats$Temperature_now_celcius <- read.table(text = draftStats$Temperature, sep = ":", as.is = TRUE)$V2
+draftStats$Temperature_now_celcius <- read.table(text = draftStats$Temperature_now_celcius, sep = "C", as.is = TRUE)$V1
+draftStats$Temperature_now_celcius <- str_sub(draftStats$Temperature_now_celcius,1,-2)
+
+#Add Temp In Farenheight
+draftStats$Temperature_now_Farenheight <- read.table(text = draftStats$Temperature, sep = "C", as.is = TRUE)$V2
+draftStats$Temperature_now_Farenheight <- read.table(text = draftStats$Temperature_now_Farenheight, sep = "F", as.is = TRUE)$V1
+draftStats$Temperature_now_Farenheight <- str_sub(draftStats$Temperature_now_Farenheight,1,-2)
+
+#Feels Like Temp Celsius
+draftStats$Temperature_now_Feels_Like_Celcius <- read.table(text = draftStats$Temperature, sep = "s", as.is = TRUE)$V2
+draftStats$Temperature_now_Feels_Like_Celcius <- read.table(text = draftStats$Temperature_now_Feels_Like_Celcius, sep = "C", as.is = TRUE)$V1
+draftStats$Temperature_now_Feels_Like_Celcius <- str_sub(draftStats$Temperature_now_Feels_Like_Celcius,1,-2)
+
+#Feels Like Temp Farenheight
+draftStats$Temperature_now_Feels_Like_Farenheight <- read.table(text = draftStats$Temperature, sep = "C", as.is = TRUE)$V3
+draftStats$Temperature_now_Feels_Like_Farenheight <- read.table(text = draftStats$Temperature_now_Feels_Like_Farenheight, sep = "F", as.is = TRUE)$V1
+draftStats$Temperature_now_Feels_Like_Farenheight <- str_sub(draftStats$Temperature_now_Feels_Like_Farenheight,1,-2)
+
+draftStats <- subset(draftStats, select = -Temperature)
+draftStats <- subset(draftStats, select = -Liked_By_Locals)
+
+draftStats
+
+write.csv(draftStats, file = "draftStats.csv")
+```
