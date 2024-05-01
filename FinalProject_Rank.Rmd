@@ -1,0 +1,35 @@
+
+```{r}
+library(rvest)
+library(kableExtra)
+library(readr) 
+library(kableExtra) 
+library(ggplot2)
+library(tidymodels) 
+library(dplyr)
+library(zoo)
+library(janitor)
+library(GGally)
+library(ggpubr)
+library(gridExtra)
+library(forecast)
+library(DescTools)
+library(data.table)
+library(textclean)
+library(stringr)
+library(maps)
+```
+
+
+```{r}
+Nomad <- read.csv("draftStats.csv")
+
+Nomad <- Nomad %>%
+  arrange(-Total_Score) %>%
+  mutate(Rank = order(-Total_Score)) %>%
+  select(-1)
+
+write.csv(Nomad, file = "Nomad.csv")
+
+```
+
