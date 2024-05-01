@@ -1,4 +1,6 @@
 ```{r}
+#models loaded for scraping
+
 library(rvest)
 library(kableExtra)
 library(readr) 
@@ -20,6 +22,7 @@ library(maps)
 ```
 
 ```{r}
+#List of Cities used
 cities <- c("bangkok", "tokyo", "buenos-aires", "mexico-city", "chiang-mai", "kuala-lumpur",
             "seoul", "athens", "ko-pha-ngan", "zagreb", "penang", "krakow", "cape-town",
             "hong-kong", "valencia", "portimao", "budapest", "alicante", "helsinki", "rijeka",
@@ -101,24 +104,16 @@ subset
 
 
 ```{r}
+#Scraping stats from nomadlist.com
 draftStats <- tibble()
 x = 0
 for (i in cities) {
   x = x+1
   if(x %% 9 == 0) {Sys.sleep(3)}
   
-#URL and Scraping Data for Colorado Rapids
-  print(i)
+#URL and Scraping Data for Nomadlist.com
   url <- paste0("https://nomadlist.com/",i)
-  print(url)
   NBADraft <- read_html(url)
-  
-  #Getting City Names
-  #CityNames <- NBADraft %>%
-    #html_elements("div.text") %>%
-    #html_element("h3")
-    #html_table() %>%
-    #data.frame()
     
   
   #Cleaning Data
@@ -143,10 +138,12 @@ for (i in cities) {
 ```
 
 ```{r}
+#Lookng at dataframe
 draftStats
 ```
 
 ```{r}
+#Cleaning variable names
 names(draftStats)= str_sub(names(draftStats),2)
 
 names(draftStats)[1] <- "Total_Score"
@@ -187,6 +184,8 @@ names(draftStats)[35] <- "LGBTQ_Friendly"
 names(draftStats)[36] <- "Startup_Score"
 names(draftStats)[38] <- "Liked_By_Locals"
 
+
+#Cleaning Data Set / Getting important information from dataset
 
 #Total Score: Out Of Five
 draftStats$Total_Score <- read.table(text = draftStats$Total_Score, sep = "/", as.is = TRUE)$V1
@@ -292,34 +291,3 @@ draftStats
 
 write.csv(draftStats, file = "draftStats.csv")
 ```
-
-
-```{r}
-#CityNames
-```
-
-```{r}
-url <- paste0("https://nomadlist.com")
-  print(url)
-  NBADraft <- read_html(url)
-  
-  CityNames <- NBADraft %>%
-    html_elements("ul.grid.show.view") %>%
-    html_text2()
-    #html_element("h3")
-    #html_table() %>%
-    #data.frame()
-```
-
-
-```{r}
-World
-```
-
-
-
-
-
-
-
-
