@@ -11,3 +11,8 @@ Tens of thousands of people are traveling the world while working remotely from 
 Nomad List is a website that ranks cities around the world for their appeal to digital nomads. They have a community of over 30,000 members which score cities along dozens of variables, and Nomad List then uses that data to create a total score (out of 5) for each city and then ranks cities according to that score. Some of the factors include cost of living, safety, community, food, fun, internet speed, weather, crime rate, and level of English speaking – but like I said before there are far more. So, what makes for the ideal digital nomad destination? What do nomads care about? To answer this, we can look at which cities were most liked by users and figure out which factors are the most important.  
 
 At the same time, Nomad List is a business with independent motives and alternative incentives, and it does not rank the cities purely based on the proportion of users that liked the city. Nomad List has its own algorithm for rating cities and these scores are updated in real-time with new data. So then, what determines the ranking of a city from the Nomad List algorithm? Which factors are the most important for a city’s rating? Is the total score and final ranking more heavily determined by quality of life and community, or more concrete factors such as crime rates and cost of living? To answer these questions, we can look at which variables are most important for predicting the cities’ total scores. 
+
+Data Source:
+
+  Nomad list. Nomad List. (n.d.). https://nomadlist.com/
+
