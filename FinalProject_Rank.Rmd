@@ -1,5 +1,6 @@
 
 ```{r}
+#Libraries used
 library(rvest)
 library(kableExtra)
 library(readr) 
@@ -22,6 +23,8 @@ library(maps)
 
 
 ```{r}
+#Creating Correctly Ranked Dataframe
+
 Nomad <- read.csv("draftStats.csv")
 
 Nomad <- Nomad %>%
